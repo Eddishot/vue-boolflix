@@ -1,14 +1,14 @@
 <template>
   <div id="app">
     <div class="input-group my-2  mx-auto" style="max-width:400px">
-      <input   type="text" class="form-control" placeholder="Cerca cosa vuoi guardare..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+      <input v-model="typeQuery" @keyup.enter="filteredUserSearch"   type="text" class="form-control" placeholder="Cerca cosa vuoi guardare..." aria-label="Recipient's username" aria-describedby="basic-addon2">
       <div class="input-group-append">
-        <button class="btn btn-outline-primary" type="button">Cerca</button>
+        <button @click="filterdUserSearch" class="btn btn-outline-primary" type="button">Cerca</button>
       </div>
     </div>
     <ul>
       <li v-for="movie in movies" :key=movie.id>
-        {{movie.title}}
+        {{movie.title}}, {{movie.vote_average}}, ({{movie.original_title}}), {{movie.original_language}}
       </li>
     </ul>
   </div>
@@ -27,8 +27,8 @@ export default {
           apiUrl: "https://api.themoviedb.org/3",
           movies:[],
           series:[],
-          searchFilter: "",
-          // typeQuery: "",
+          // searchFilter: "",
+          typeQuery: "",
 
           // urlEndType: {
           //   movie: "/search/movie",
@@ -44,30 +44,42 @@ export default {
         
       },
       methods:{
+        // funzione principale
+        userSearch(url, typeGenre){
+           axios
+                .get(this.apiUrl + url, {
 
-        userSearch(){
-          axios
-        .get(this.apiUrl + "/search/movie/", {
+                  params:{
+                    api_key:this.apiKey,
+                    query: this.typeQuery,
+                    language:"it",
 
-          params:{
-            api_key:this.apiKey,
-            query:"strange",
-            language:"it",
-            // query: this.typeQuery,
-          }
-        })
-        .then((resp) => {
-          
-          this.movies =resp.data.results;
-        });
-        }
+                    // query: this.typeQuery,
+                  }
+                })
+                .then((resp) => {
+                  
+                  this[typeGenre] =resp.data.results;
+                });
+        },
+          //  funzioni per la ricerca di film e serietv
+        filterdUserSearch(){
+          this.userSearch("/search/movie", "strange", "movies"); 
+
+          this.userSearch("/search/movie", "strange", "series");
       },
-      // mounted(){
         
-      // }
+      },
+      mounted(){
+        
+      
+      
+      }
+      
+}
     
   
-}
+
 </script>
 
 <style lang="scss">
